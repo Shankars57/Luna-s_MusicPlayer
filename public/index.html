@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Songs Player</title>
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="app.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css"
+      integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      /* Custom Styles */
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+        color: #fff;
+        overflow: hidden;
+      }
+
+      .player {
+        position: relative;
+        margin: auto;
+        padding: 20px;
+        max-width: 400px;
+        border-radius: 15px;
+        text-align: center;
+      }
+
+      .player-title {
+        font-family: "Lobster", cursive;
+        font-size: 2rem;
+        color: #ffde59;
+        margin-top: 20px;
+      }
+
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 10;
+      }
+
+      /* Adjust other styles */
+      .wrapper {
+        position: relative;
+        z-index: 20;
+      }
+
+      .details .now-playing {
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+        color: #ffd1dc;
+      }
+
+      .details .track-name,
+      .details .track-artist {
+        font-size: 1.1rem;
+        font-weight: bold;
+      }
+
+      .buttons i {
+        transition: transform 0.2s ease;
+      }
+
+      .buttons i:hover {
+        transform: scale(1.2);
+        color: #ffde59;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Music Player Container -->
+    <div class="container">
+      <div class="player">
+        <!-- Grizzly Bear-->
+        <div class="grizzly-bear">
+          <img src="images/teddy.jpg" class="bear" alt="Grizzly Bear" />
+        </div>
+        <!-- Title Section -->
+        <div class="player-title">Songs Player</div>
+        <!-- Wrapper for Pla yer Content -->
+        <div class="wrapper">
+          <!-- Track Details -->
+          <div class="details">
+            <div class="now-playing">Playing X of Y</div>
+            <div class="track-art"></div>
+            <div class="track-name">Track Name</div>
+            <div class="track-artist">Track Artist</div>
+          </div>
+
+          <!-- Slider for Seek and Volume -->
+          <div class="slider_container">
+            <div class="current-time">00:00</div>
+            <input
+              type="range"
+              min="1"
+              max="100"
+              value="0"
+              class="seek_slider"
+              onchange="seekTo()"
+            />
+            <div class="total-duration">00:00</div>
+          </div>
+          <div class="slider_container">
+            <i class="fa fa-volume-down"></i>
+            <input
+              type="range"
+              min="1"
+              max="100"
+              value="99"
+              class="volume_slider"
+              onchange="setVolume()"
+            />
+            <i class="fa fa-volume-up"></i>
+          </div>
+
+          <!-- Controls for Playback -->
+          <div class="buttons">
+            <div class="random-track" onclick="randomTrack()">
+              <i class="fa fa-random fa-2x" title="Random"></i>
+            </div>
+            <div class="prev-track" onclick="prevTrack()">
+              <i class="fa fa-step-backward fa-2x" title="Previous"></i>
+            </div>
+            <div class="playpause-track" onclick="playPauseTrack()">
+              <i class="fa fa-play-circle fa-5x" title="Play/Pause"></i>
+            </div>
+            <div class="next-track" onclick="nextTrack()">
+              <i class="fa fa-step-forward fa-2x" title="Next"></i>
+            </div>
+            <div class="repeat-track" onclick="repeatTrack()">
+              <i class="fa fa-repeat fa-2x" title="Repeat"></i>
+            </div>
+          </div>
+
+          <!-- Visualizer (Wave Animation) -->
+          <div id="wave">
+            <span class="stroke"></span>
+            <span class="stroke"></span>
+            <span class="stroke"></span>
+            <span class="stroke"></span>
+            <span class="stroke"></span>
+            <span class="stroke"></span>
+            <span class="stroke"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Love Canvas 
+    <canvas id="loveCanvas"></canvas>
+
+    <script>
+      const canvas = document.getElementById("loveCanvas");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const hearts = [];
+
+      class Heart {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+          this.size = Math.random() * 20 + 10;
+          this.speedY = Math.random() * 1 + 1;
+          this.color = `rgba(255, 255, 180, ${Math.random()})`;
+        }
+
+        draw() {
+          ctx.beginPath();
+          ctx.moveTo(this.x, this.y);
+          ctx.bezierCurveTo(
+            this.x - this.size / 2,
+            this.y - this.size / 2,
+            this.x - this.size,
+            this.y + this.size / 3,
+            this.x,
+            this.y + this.size
+          );
+          ctx.bezierCurveTo(
+            this.x + this.size,
+            this.y + this.size / 3,
+            this.x + this.size / 2,
+            this.y - this.size / 2,
+            this.x,
+            this.y
+          );
+          ctx.fillStyle = this.color;
+          ctx.fill();
+        }
+
+        update() {
+          this.y -= this.speedY;
+        }
+      }
+
+      function handleHearts() {
+        for (let i = hearts.length - 1; i >= 0; i--) {
+          hearts[i].update();
+          hearts[i].draw();
+
+          if (hearts[i].y < 0 - hearts[i].size) {
+            hearts.splice(i, 1);
+          }
+        }
+      }
+
+      function generateHearts() {
+        const x = Math.random() * canvas.width;
+        const y = canvas.height - 50;
+        hearts.push(new Heart(x, y));
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        handleHearts();
+        requestAnimationFrame(animate);
+      }
+
+      window.addEventListener("resize", () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+
+      animate();
+      setInterval(generateHearts, 500);
+    </script>-->
+  </body>
+</html>
